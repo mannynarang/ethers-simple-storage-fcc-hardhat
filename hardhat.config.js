@@ -29,6 +29,11 @@ module.exports = {
     // Obtain one at https://etherscan.io/
     apiKey: "UIV1Z4MU7UHQWM8DSKK9PWXF93SCJC73RH",
   },
+  gasReporter: {
+    enabled: true,
+    currency: "USD",
+    // coinmarketcap:
+  },
 };
 
 task("accounts", "Prints the list of accounts", async () => {
