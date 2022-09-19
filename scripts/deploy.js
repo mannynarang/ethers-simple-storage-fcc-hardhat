@@ -6,6 +6,8 @@
 // global scope, and execute the script.
 const hre = require("hardhat");
 
+require("@nomiclabs/hardhat-etherscan");
+
 async function main() {
   const SimpleStorageFactory = await hre.ethers.getContractFactory(
     "SimpleStorage"
@@ -16,6 +18,34 @@ async function main() {
 
   await SimpleStorage.deployed();
   console.log(SimpleStorage.address);
+
+  // console.log(hre.config);
+  if (hre.network["config"].chainId != 31337) {
+    //wait 6 blocks
+    await SimpleStorage.deployTransaction.wait(6);
+
+    await verify(SimpleStorage.address, []);
+  }
+
+  const currentValue = await SimpleStorage.retrieve();
+  console.log(`Current Value is ${currentValue}`);
+  const transactionResponse = await SimpleStorage.store(7);
+  await SimpleStorage.deployTransaction.wait(1);
+  const updatedValue = await SimpleStorage.retrieve();
+  console.log(`Current Value is ${updatedValue}`);
+}
+
+async function verify(contractaddress, args) {
+  console.log("Verifying contract");
+
+  try {
+    await run("verify:verify", {
+      address: contractaddress,
+      constructorArguments: args,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
